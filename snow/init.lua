@@ -1,6 +1,12 @@
+local particlespawner
+
 ctf_match.register_on_new_match(function()
-	minetest.add_particlespawner{
-		amount = 100,
+	if particlespawner ~= nil then
+		minetest.delete_particlespawner(particlespawner)
+	end
+
+	particlespawner = minetest.add_particlespawner{
+		amount = math.random(35, 70),
 		time = 0,
 		minpos = vector.new(ctf_map.map.pos1.x, ctf_map.map.h/2 - 1, ctf_map.map.pos1.z),
 		maxpos = vector.new(ctf_map.map.pos2.x, ctf_map.map.h/2 - 1, ctf_map.map.pos2.z),
@@ -10,11 +16,11 @@ ctf_match.register_on_new_match(function()
 		maxacc = {x=0, y=0, z=0},
 		minexptime = 9,
 		maxexptime = 10,
-		minsize = 3,
-		maxsize = 5,
+		minsize = 4,
+		maxsize = 6,
 		collisiondetection = false,
 		vertical = false,
 		texture = "snow_snowflake.png",
-		glow = 1
+		glow = 0
 	}
 end)
