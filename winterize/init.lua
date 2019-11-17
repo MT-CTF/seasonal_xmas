@@ -31,7 +31,7 @@ minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
 minetest.register_lbm({
 	label = "Add ice layer to top of water",
 	name = "winterize:top_water_with_ice",
-	nodenames = {"group:water"},
+	nodenames = {"default:water_source"},
 	run_at_every_load = true,
 	action = function(pos, node)
 		local pos_above = vector.new(pos.x, pos.y + 1, pos.z)
