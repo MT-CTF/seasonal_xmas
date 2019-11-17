@@ -6,7 +6,7 @@ local leaves = {"leaves", "aspen_leaves", "jungleleaves"}
 minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
 	drawtype = "nodebox",
 	description = "Ice",
-	tiles = {"default_ice.png"},
+	tiles = {"ice_seethrough.png"},
 	buildable_to = true,
 	floodable = true,
 	paramtype = "light",
