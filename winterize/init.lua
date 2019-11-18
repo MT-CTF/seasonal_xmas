@@ -48,6 +48,10 @@ minetest.register_lbm({
 	nodenames = {"group:crumbly", "group:leaves"},
 	run_at_every_load = true,
 	action = function(pos, node)
+		if node.name == "default:clay" then -- Some floors in Karsthafen are made of clay
+			return
+		end
+
 		local pos_above = vector.new(pos.x, pos.y + 1, pos.z)
 
 		if minetest.get_node(pos_above).name == "air" and node.name ~= "default:snow" then
