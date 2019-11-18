@@ -24,7 +24,7 @@ minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
 		},
 	},
 	drop = "",
-	groups = {dig_immediate = 3, cools_lava = 1, slippery = 4},
+	groups = {dig_immediate = 3, slippery = 4},
 	sounds = default.node_sound_glass_defaults(),
 })
 
