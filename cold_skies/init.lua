@@ -1,5 +1,5 @@
 local cold_players = {}
-
+local COLD_START_HEIGHT = ctf_map.map.h / 2 - 10
 local dstep = 0
 minetest.register_globalstep(function(dtime)
 	dstep = dstep + dtime
