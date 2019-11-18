@@ -13,7 +13,7 @@ minetest.register_globalstep(function(dtime)
 	for _, player in pairs(minetest.get_connected_players()) do
 		local pos = player:get_pos()
 
-		if pos.y >= (ctf_map.map.h / 2 - 10) then
+		if pos.y >= COLD_START_HEIGHT then
 			local name = player:get_player_name()
 
 			if not cold_players[name] then
@@ -41,7 +41,7 @@ minetest.register_globalstep(function(dtime)
 			cold_players[name] = nil
 		end
 
-		if player:get_pos().y <= (ctf_map.map.h / 2 - 10) then
+		if player:get_pos().y <= COLD_START_HEIGHT then
 			player:hud_remove(hudkey)
 			cold_players[name] = nil
 		end
