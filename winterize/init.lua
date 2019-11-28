@@ -72,7 +72,7 @@ minetest.register_lbm({
 		node.name ~= "ctf_map:cobble" and minetest.registered_items[node.name].walkable then
 			local found_obstruction = can_snow_fall_freely(pos_above)
 
-			if not found_obstruction then
+			if not can_snow_fall_freely(pos_above) then
 				minetest.set_node(pos_above, {name = "default:snow"})
 			end
 		end
