@@ -42,20 +42,39 @@ minetest.register_lbm({
 	end
 })
 
+local function can_snow_fall_freely(pos)
+	local voxelmanip = VoxelManip()
+	local aircheck_pos = vector.new(pos.x, pos.y + 20, pos.z)
+	local vpos1, vpos2 = voxelmanip:read_from_map(pos, aircheck_pos)
+	local voxelarea = VoxelArea:new{MinEdge=vpos1, MaxEdge=vpos2}
+	local nodes_above = voxelmanip:get_data()
+
+	for ypos = pos.y, aircheck_pos.y, 1 do
+		local nodeid = nodes_above[voxelarea:indexp(vector.new(pos.x, ypos, pos.z))]
+		if nodeid ~= minetest.CONTENT_AIR and
+		minetest.registered_items[minetest.get_name_from_content_id(nodeid)].pointable then -- ignore barriers
+			return true -- Obstuction found
+		end
+	end
+
+	return false -- Snow can fall freely
+end
+
 minetest.register_lbm({
 	label = "Place snow on top of nodes",
 	name = "winterize:top_nodes_with_snow",
-	nodenames = {"group:crumbly", "group:leaves"},
+	nodenames = {"group:crumbly", "group:leaves", "group:cracky", "group:choppy"},
 	run_at_every_load = true,
 	action = function(pos, node)
-		if node.name == "default:clay" then -- Some floors in Karsthafen are made of clay
-			return
-		end
-
 		local pos_above = vector.new(pos.x, pos.y + 1, pos.z)
 
-		if minetest.get_node(pos_above).name == "air" and node.name ~= "default:snow" then
-			minetest.set_node(pos_above, {name = "default:snow"})
+		if minetest.get_node(pos_above).name == "air" and node.name ~= "default:snow" and
+		node.name ~= "ctf_map:cobble" and minetest.registered_items[node.name].walkable then
+			local found_obstruction = can_snow_fall_freely(pos_above)
+
+			if not found_obstruction then
+				minetest.set_node(pos_above, {name = "default:snow"})
+			end
 		end
 	end
 })
