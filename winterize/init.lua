@@ -2,6 +2,7 @@ local snowy_dirt_tiles = minetest.registered_nodes["default:dirt_with_snow"].til
 local snowy_dirt_sounds = minetest.registered_nodes["default:dirt_with_snow"].sounds
 local grasses = {"dry_grass", "grass", "coniferous_litter",}
 local leaves = {"leaves", "aspen_leaves", "jungleleaves"}
+local snow_placement_blacklist = {"default:snow", "slab", "stair", "fence"}
 
 minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
 	drawtype = "nodebox",
@@ -68,8 +69,13 @@ minetest.register_lbm({
 	action = function(pos, node)
 		local pos_above = vector.new(pos.x, pos.y + 1, pos.z)
 
-		if minetest.get_node(pos_above).name == "air" and node.name ~= "default:snow" and
-		node.name ~= "ctf_map:cobble" and minetest.registered_items[node.name].walkable then
+		for _, searchfor in pairs(snow_placement_blacklist) do
+			if node.name:find(searchfor) ~= nil then
+				return
+			end
+		end
+
+		if minetest.get_node(pos_above).name == "air" and minetest.registered_items[node.name].walkable then
 			if snow_can_fall_freely(pos_above) then
 				minetest.set_node(pos_above, {name = "default:snow"})
 			end
