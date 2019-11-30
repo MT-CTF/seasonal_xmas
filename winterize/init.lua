@@ -42,7 +42,7 @@ minetest.register_lbm({
 	end
 })
 
-local function can_snow_fall_freely(pos)
+local function snow_can_fall_freely(pos)
 	local voxelmanip = VoxelManip()
 	local aircheck_pos = vector.new(pos.x, pos.y + 20, pos.z)
 	local vpos1, vpos2 = voxelmanip:read_from_map(pos, aircheck_pos)
@@ -53,11 +53,11 @@ local function can_snow_fall_freely(pos)
 		local nodeid = nodes_above[voxelarea:indexp(vector.new(pos.x, ypos, pos.z))]
 		if nodeid ~= minetest.CONTENT_AIR and
 		minetest.registered_items[minetest.get_name_from_content_id(nodeid)].pointable then -- ignore barriers
-			return true -- Obstuction found
+			return false -- Obstuction found
 		end
 	end
 
-	return false -- Snow can fall freely
+	return true -- Snow can fall freely
 end
 
 minetest.register_lbm({
@@ -70,7 +70,7 @@ minetest.register_lbm({
 
 		if minetest.get_node(pos_above).name == "air" and node.name ~= "default:snow" and
 		node.name ~= "ctf_map:cobble" and minetest.registered_items[node.name].walkable then
-			if not can_snow_fall_freely(pos_above) then
+			if snow_can_fall_freely(pos_above) then
 				minetest.set_node(pos_above, {name = "default:snow"})
 			end
 		end
