@@ -9,3 +9,5 @@ All content must be freely licensed.
 * winterize - MIT - LoneWolf
 * snow - MIT - LoneWolf
 * Santa - CC BY-SA 3.0 - jordan4ibanez
+  - `ctf_colors_skin_red.png` is the original skin by jordan4ibanez
+  - `ctf_colors_skin_blue.png` is based on `ctf_colors_skin_red.png` and was modified by Thomas-S
