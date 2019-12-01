@@ -86,10 +86,12 @@ minetest.register_lbm({
 for _, leaftype in pairs(leaves) do
 	minetest.override_item("default:" .. leaftype, {
 		tiles = {"winterize_dead_leaves.png"},
+		special_tiles = {"winterize_dead_leaves.png"},
 	})
 
 	minetest.override_item("ctf_map:" .. leaftype, {
 		tiles = {"winterize_dead_leaves.png"},
+		special_tiles = {"winterize_dead_leaves.png"},
 	})
 end
 
