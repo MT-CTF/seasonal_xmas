@@ -1,13 +1,15 @@
 local function spawn_particle_inside_area(player, pos1, pos2) -- Spawns a particle inside the area defined by pos1/pos2
-	minetest.add_particle({
-        pos = {
-			x = math.random(pos1.x, pos2.x),
-			y = math.random(pos1.y, pos2.y),
-			z = math.random(pos1.z, pos2.z),
-		},
-        velocity = vector.new(0, math.random(-10, -15), 0),
-        expirationtime = 10,
-        size = math.random(3, 5),
+	minetest.add_particlespawner({
+	    amount = 25,
+		minpos = pos1,
+		maxpos = pos2,
+        minvel = vector.new(0, -10, 0),
+        maxvel = vector.new(0, -15, 0),
+        time = 1.4,
+        minexptime = 10,
+        maxexptime = 10,
+        minsize = 3,
+        maxsize = 5,
         collisiondetection = true,
         collision_removal = true,
         object_collision = true,
@@ -18,14 +20,12 @@ local function spawn_particle_inside_area(player, pos1, pos2) -- Spawns a partic
 	})
 end
 
-local function spawn_particles(player) -- Spawns 7 snow particles around player
+local function spawn_particles(player) -- Spawns snow particles around player
 	local pos = player:get_pos()
 	local pos1 = vector.new(pos.x - 20, pos.y + 15, pos.z - 20)
 	local pos2 = vector.new(pos.x + 20, pos.y + 20, pos.z + 20)
 
-	for i = 1, 7, 1 do
-		spawn_particle_inside_area(player, pos1, pos2)
-	end
+    spawn_particle_inside_area(player, pos1, pos2)
 end
 
 local spawner_step = 0
