@@ -54,7 +54,7 @@ local function snow_can_fall_freely(pos)
 		local nodeid = nodes_above[voxelarea:indexp(vector.new(pos.x, ypos, pos.z))]
 		if nodeid ~= minetest.CONTENT_AIR and
 		minetest.registered_items[minetest.get_name_from_content_id(nodeid)].pointable then -- ignore barriers
-			return false -- Obstuction found
+			return false -- Obstruction found
 		end
 	end
 
