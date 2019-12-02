@@ -31,7 +31,7 @@ local function spawn_particles(player)
 		collision_removal = true,
 		object_collision = true,
 		vertical = false,
-		texture = "snow_snowflake" .. math.random(1, 15) .. ".png",
+		texture = ("[combine:7x7:%s,%s=snow_snowflakes.png"):format(math.random(0, 3) * -7, math.random(0, 1) * -7),
 		playername = player:get_player_name(),
 		glow = 0
 	})
