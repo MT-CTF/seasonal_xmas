@@ -2,47 +2,74 @@
 -- particle spawner which lasts for 1.4s every 0.7s for each player. The spawners are
 -- bound to individual players
 
--- Spawns a particle inside the area defined by pos1/pos2
-local function spawn_particle_inside_area(player, pos1, pos2)
+local NISVAL = 10 -- Overcast sky RGB value at night (brightness)
+local DASVAL = 90 -- Overcast sky RGB value in daytime (brightness)
+local DIFSVAL = DASVAL - NISVAL
+
+-- Set clouds
+minetest.register_on_joinplayer(function(player)
+	player:set_clouds({
+		density = 0.7,
+		color = "#aaaaaacc",
+		height = 100,
+		thickness = 20,
+		speed = {x = -3, z = -3},
+	})
+end)
+
+-- Spawns snow particles around player
+local function spawn_particles(player)
+	local pos = player:get_pos()
 	minetest.add_particlespawner({
-		amount = 25,
-		minpos = pos1,
-		maxpos = pos2,
-		minvel = vector.new(0, -10, 0),
-		maxvel = vector.new(0, -15, 0),
-		time = 1.4,
+		amount = 35,
+		minpos = vector.new(pos.x - 25, pos.y + 15, pos.z - 25),
+		maxpos = vector.new(pos.x + 25, pos.y + 25, pos.z + 25),
+		minvel = vector.new(-2, -7, -2),
+		maxvel = vector.new(-2, -9, -2),
+		time = 1,
 		minexptime = 10,
 		maxexptime = 10,
-		minsize = 3,
-		maxsize = 5,
+		minsize = 1,
+		maxsize = 3,
 		collisiondetection = true,
 		collision_removal = true,
 		object_collision = true,
 		vertical = false,
-		texture = "snow_snowflake.png",
+		texture = ("[combine:7x7:%s,%s=snow_snowflakes.png"):format(math.random(0, 3) * -7, math.random(0, 1) * -7),
 		playername = player:get_player_name(),
 		glow = 0
 	})
-end
-
- -- Spawns snow particles around player
-local function spawn_particles(player)
-	local pos = player:get_pos()
-	local pos1 = vector.new(pos.x - 20, pos.y + 15, pos.z - 20)
-	local pos2 = vector.new(pos.x + 20, pos.y + 20, pos.z + 20)
-
-	spawn_particle_inside_area(player, pos1, pos2)
 end
 
 local spawner_step = 0
 minetest.register_globalstep(function(dtime)
 	spawner_step = spawner_step + dtime
 
-	if spawner_step >= 0.7 then
+	if spawner_step >= 0.5 then
 		spawner_step = 0
 
 		for _, player in pairs(minetest.get_connected_players()) do
+			-- Spawn snow
 			spawn_particles(player)
+
+			-- Update sky (stolen from snowdrift https://github.com/paramat/snowdrift/blob/master/init.lua#L132-L151)
+			local sval
+			local time = minetest.get_timeofday()
+			if time >= 0.5 then
+				time = 1 - time
+			end
+			-- Sky brightness transitions:
+			-- First transition (24000 -) 4500, (1 -) 0.1875
+			-- Last transition (24000 -) 5750, (1 -) 0.2396
+			if time <= 0.1875 then
+				sval = NISVAL
+			elseif time >= 0.2396 then
+				sval = DASVAL
+			else
+				sval = math.floor(NISVAL +
+					((time - 0.1875) / 0.0521) * DIFSVAL)
+			end
+			player:set_sky({r = sval - 8, g = sval, b = sval + 8, a = 255},	"plain", {}, true)
 		end
 	end
 end)

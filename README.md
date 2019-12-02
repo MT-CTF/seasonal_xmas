@@ -6,8 +6,14 @@ All content must be freely licensed.
 
 ## Credits
 
-* winterize - MIT - LoneWolf
-* snow - MIT - LoneWolf
-* Santa - CC BY-SA 3.0 - jordan4ibanez
-  - `ctf_colors_skin_red.png` is the original skin by jordan4ibanez
-  - `ctf_colors_skin_blue.png` is based on `ctf_colors_skin_red.png` and was modified by Thomas-S
+### Code
+* `skins` MIT by LoneWolf
+* `snow` MIT by LoneWolf, rubenwardy, Thomas-S, and GreenXenith
+* `winterize` MIT by LoneWolf
+
+### Media
+* `Santa` CC BY-SA 3.0 by jordan4ibanez
+  - `ctf_colors_skin_red.png` by jordan4ibanez
+  - `ctf_colors_skin_blue.png` based on `ctf_colors_skin_red.png`, modified by Thomas-S
+* `Snowflakes` CC BY-SA 3.0 by paramat
+* `Winterize` CC0 1.0 Universal by LoneWolf
