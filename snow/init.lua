@@ -2,6 +2,10 @@
 -- particle spawner which lasts for 1.4s every 0.7s for each player. The spawners are
 -- bound to individual players
 
+local NISVAL = 10 -- Overcast sky RGB value at night (brightness)
+local DASVAL = 90 -- Overcast sky RGB value in daytime (brightness)
+local DIFSVAL = DASVAL - NISVAL
+
 -- Set clouds
 minetest.register_on_joinplayer(function(player)
 	player:set_clouds({
@@ -49,9 +53,6 @@ minetest.register_globalstep(function(dtime)
 			spawn_particles(player)
 
 			-- Update sky (stolen from snowdrift https://github.com/paramat/snowdrift/blob/master/init.lua#L132-L151)
-			local NISVAL = 10 -- Overcast sky RGB value at night (brightness)
-			local DASVAL = 90 -- Overcast sky RGB value in daytime (brightness)
-			local difsval = DASVAL - NISVAL
 			local sval
 			local time = minetest.get_timeofday()
 			if time >= 0.5 then
@@ -66,7 +67,7 @@ minetest.register_globalstep(function(dtime)
 				sval = DASVAL
 			else
 				sval = math.floor(NISVAL +
-					((time - 0.1875) / 0.0521) * difsval)
+					((time - 0.1875) / 0.0521) * DIFSVAL)
 			end
 			player:set_sky({r = sval - 8, g = sval, b = sval + 8, a = 255},	"plain", {}, true)
 		end
