@@ -20,9 +20,9 @@ local function spawn_particles(player)
 		amount = 35,
 		minpos = vector.new(pos.x - 25, pos.y + 15, pos.z - 25),
 		maxpos = vector.new(pos.x + 25, pos.y + 25, pos.z + 25),
-		minvel = vector.new(-2, -5, -2),
-		maxvel = vector.new(-2, -7, -2),
-		time = 1.4,
+		minvel = vector.new(-2, -7, -2),
+		maxvel = vector.new(-2, -9, -2),
+		time = 1,
 		minexptime = 10,
 		maxexptime = 10,
 		minsize = 1,
@@ -41,7 +41,7 @@ local spawner_step = 0
 minetest.register_globalstep(function(dtime)
 	spawner_step = spawner_step + dtime
 
-	if spawner_step >= 0.7 then
+	if spawner_step >= 0.5 then
 		spawner_step = 0
 
 		for _, player in pairs(minetest.get_connected_players()) do
