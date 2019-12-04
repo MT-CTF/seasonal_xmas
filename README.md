@@ -7,8 +7,7 @@ All content must be freely licensed.
 ## Credits
 
 ### Code
-
-* `skins` MIT by LoneWolfHT
+* `skins` MIT by rubenwardy
 * `snow` MIT by LoneWolfHT, rubenwardy, Thomas-S, and GreenXenith
 * `winterize` MIT by LoneWolfHT
 
