@@ -33,7 +33,6 @@ minetest.register_lbm({
 	label = "Add ice layer to top of water",
 	name = "winterize:top_water_with_ice",
 	nodenames = {"default:water_source"},
-	run_at_every_load = true,
 	action = function(pos, node)
 		local pos_above = vector.new(pos.x, pos.y + 1, pos.z)
 
@@ -65,7 +64,6 @@ minetest.register_lbm({
 	label = "Place snow on top of nodes",
 	name = "winterize:top_nodes_with_snow",
 	nodenames = {"group:crumbly", "group:leaves", "group:cracky", "group:choppy"},
-	run_at_every_load = true,
 	action = function(pos, node)
 		local pos_above = vector.new(pos.x, pos.y + 1, pos.z)
 
