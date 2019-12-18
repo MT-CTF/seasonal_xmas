@@ -2,6 +2,8 @@ local snowy_dirt_tiles = minetest.registered_nodes["default:dirt_with_snow"].til
 local snowy_dirt_sounds = minetest.registered_nodes["default:dirt_with_snow"].sounds
 local grasses = {"dry_grass", "grass", "coniferous_litter",}
 local leaves = {"leaves", "aspen_leaves", "jungleleaves"}
+
+--[[
 local snow_placement_blacklist = {"default:snow", "slab", "stair", "fence"}
 
 minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
@@ -82,6 +84,7 @@ minetest.register_lbm({
 		end
 	end
 })
+]]
 
 for _, leaftype in pairs(leaves) do
 	minetest.override_item("default:" .. leaftype, {
