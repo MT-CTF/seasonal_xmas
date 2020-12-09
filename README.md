@@ -10,6 +10,7 @@ All content must be freely licensed.
 * `skins` MIT by rubenwardy
 * `snow` MIT by LoneWolfHT, rubenwardy, Thomas-S, and GreenXenith
 * `winterize` MIT by LoneWolfHT
+* `throwable_snow` MIT by LoneWolfHT
 
 ### Media
 
