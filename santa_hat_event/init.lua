@@ -8,7 +8,7 @@ local old_func = throwable_snow.on_hit_player
 function throwable_snow.on_hit_player(thrower, player, ...)
 	local throwerobj = minetest.get_player_by_name(thrower)
 
-	if throwerobj then
+	if throwerobj and ctf_teams.get(thrower) ~= ctf_teams.get(player) then
 		local meta = throwerobj:get_meta()
 		local old_val = meta:get_int(META_KEY)
 		local new_val = old_val + 1
