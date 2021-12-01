@@ -20,7 +20,7 @@ function throwable_snow.on_hit_player(thrower, player, ...)
 				text = "You have unlocked this year's christmas hat!",
 				color = "success",
 			})
-			sfinv.set_page(player, sfinv.get_page(player))
+			sfinv.set_page(thrower, sfinv.get_page(thrower))
 		end
 	end
 
