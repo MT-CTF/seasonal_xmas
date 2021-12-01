@@ -20,7 +20,8 @@ function throwable_snow.on_hit_player(thrower, player, ...)
 				text = "You have unlocked this year's christmas hat!",
 				color = "success",
 			})
-			sfinv.set_page(thrower, sfinv.get_page(thrower))
+
+			meta:set_int(COSMETIC_KEY, 1)
 		end
 	end
 
@@ -39,7 +40,7 @@ sfinv.register_page("santa_hat_event:progress", {
 		local form = "real_coordinates[true]"
 
 		if players_hit < REQUIRED_HITS then
-			form = string.format("%slabel[0.1,0.5;Hit %d enemy players with a snowball to get a cool christmas hat! %s]", form,
+			form = string.format("%slabel[0.1,0.5;Hit %d enemy players with a snowball to get a cool christmas hat!\n%s]", form,
 				REQUIRED_HITS,
 				"Dead enemies count >:)"
 			)
