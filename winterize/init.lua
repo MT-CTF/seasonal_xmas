@@ -1,10 +1,12 @@
+if os.date("%m") ~= "12" then return end
+
 local snowy_dirt_tiles = minetest.registered_nodes["default:dirt_with_snow"].tiles
 local snowy_dirt_sounds = minetest.registered_nodes["default:dirt_with_snow"].sounds
 local grasses = {"dry_grass", "grass", "coniferous_litter",}
 local leaves = {"leaves", "aspen_leaves", "jungleleaves"}
 
 
-local snow_placement_blacklist = {"default:snow", "*slab*", "*stair*", "*fence*"}
+local snow_placement_blacklist = {"default:snow", ".*slab.*", ".*stair.*", ".*fence.*", ".*post.*", ".*door.*"}
 
 minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
 	drawtype = "nodebox",
@@ -14,6 +16,7 @@ minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
 	floodable = true,
 	paramtype = "light",
 	sunlight_propogates = true,
+	use_texture_alpha = "clip",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -67,23 +70,29 @@ minetest.register_lbm({
 -- 	return not minetest.raycast(pos, vector.new(pos.x, pos.y+5, pos.z), false, true):next()
 -- end
 
+local match = string.match
+local get_node = minetest.get_node
+local set_node = minetest.set_node
+local registered_items = minetest.registered_items
 minetest.register_lbm({
 	label = "Place snow on top of nodes",
 	name = "winterize:top_nodes_with_snow",
 	nodenames = {"group:crumbly", "group:leaves", "group:choppy"},
 	run_at_every_load = true,
 	action = function(pos, node)
-		local pos_above = vector.new(pos.x, pos.y + 1, pos.z)
+		if node.name == "air" then return end
+
+		local pos_above = {x = pos.x, y = pos.y + 1, z = pos.z}
 
 		for _, searchfor in pairs(snow_placement_blacklist) do
-			if node.name:match(searchfor) ~= nil then
+			if match(node.name, searchfor) then
 				return
 			end
 		end
 
-		if minetest.get_node(pos_above).name == "air" and minetest.registered_items[node.name].walkable then
+		if get_node(pos_above).name == "air" and registered_items[node.name].walkable then
 			-- if snow_can_fall_freely(pos_above) then
-				minetest.set_node(pos_above, {name = "default:snow"})
+				set_node(pos_above, {name = "default:snow"})
 			-- end
 		end
 	end
