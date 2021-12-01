@@ -2,7 +2,7 @@ if os.date("%m") ~= "12" or not minetest.get_modpath("server_cosmetics") then re
 
 local META_KEY = "server_cosmetics:snowballs:"..os.date("%Y")
 local COSMETIC_KEY = "server_cosmetics:entity:santa_hat:"..os.date("%Y")
-local REQUIRED_HITS = 600
+local REQUIRED_HITS = 500
 
 local old_func = throwable_snow.on_hit_player
 function throwable_snow.on_hit_player(thrower, player, ...)
