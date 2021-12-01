@@ -39,8 +39,9 @@ sfinv.register_page("santa_hat_event:progress", {
 		local form = "real_coordinates[true]"
 
 		if players_hit < REQUIRED_HITS then
-			form = string.format("%slabel[0.1,0.5;Hit %d players with a snowball to get a cool christmas hat!]", form,
-				REQUIRED_HITS
+			form = string.format("%slabel[0.1,0.5;Hit %d enemy players with a snowball to get a cool christmas hat! %s]", form,
+				REQUIRED_HITS,
+				"Dead enemies count >:)"
 			)
 		else
 			form = form .. "label[0.1,0.5;Nice job! Pop over to the customization tab to try out your new hat!]"
