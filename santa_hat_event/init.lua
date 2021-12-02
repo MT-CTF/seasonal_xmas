@@ -13,7 +13,9 @@ function throwable_snow.on_hit_player(thrower, player, ...)
 		local old_val = meta:get_int(META_KEY)
 		local new_val = old_val + 2
 
-		meta:set_int(META_KEY, new_val)
+		if old_val <= REQUIRED_HITS then
+			meta:set_int(META_KEY, new_val)
+		end
 
 		if old_val < REQUIRED_HITS and new_val >= REQUIRED_HITS then
 			hud_events.new(thrower, {
