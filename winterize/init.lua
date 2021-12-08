@@ -81,7 +81,7 @@ minetest.register_lbm({
 	nodenames = {"group:crumbly", "group:leaves", "group:choppy"},
 	run_at_every_load = true,
 	action = function(pos, node)
-		if node.name == "air" or random(1, 14) ~= 1 then return end
+		if node.name == "air" or random(1, 20) ~= 1 then return end
 
 		local pos_above = {x = pos.x, y = pos.y + 1, z = pos.z}
 
