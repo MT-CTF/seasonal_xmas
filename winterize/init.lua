@@ -34,20 +34,6 @@ minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
 	sounds = default.node_sound_glass_defaults(),
 })
 
-minetest.register_lbm({
-	label = "Add ice layer to top of water",
-	name = "winterize:top_water_with_ice",
-	nodenames = {"default:water_source", "default:river_water_source"},
-	run_at_every_load = true,
-	action = function(pos, node)
-		local pos_above = vector.new(pos.x, pos.y + 1, pos.z)
-
-		if minetest.get_node(pos_above).name == "air" then
-			minetest.set_node(pos_above, {name = "winterize:ice"})
-		end
-	end
-})
-
 -- local function snow_can_fall_freely(pos)
 -- 	local voxelmanip = VoxelManip()
 -- 	local aircheck_pos = vector.new(pos.x, pos.y + 20, pos.z)
@@ -70,17 +56,32 @@ minetest.register_lbm({
 -- 	return not minetest.raycast(pos, vector.new(pos.x, pos.y+5, pos.z), false, true):next()
 -- end
 
-local match = string.match
 local get_node = minetest.get_node
 local set_node = minetest.set_node
+minetest.register_lbm({
+	label = "Add ice layer to top of water",
+	name = "winterize:top_water_with_ice",
+	nodenames = {"default:water_source", "default:river_water_source"},
+	run_at_every_load = true,
+	action = function(pos, node)
+		local pos_above = vector.new(pos.x, pos.y + 1, pos.z)
+
+		if minetest.get_node(pos_above).name == "air" then
+			minetest.set_node(pos_above, {name = "winterize:ice"})
+		end
+	end
+})
+
+local match = string.match
 local registered_items = minetest.registered_items
+local random = math.random
 minetest.register_lbm({
 	label = "Place snow on top of nodes",
 	name = "winterize:top_nodes_with_snow",
 	nodenames = {"group:crumbly", "group:leaves", "group:choppy"},
 	run_at_every_load = true,
 	action = function(pos, node)
-		if node.name == "air" then return end
+		if node.name == "air" or random(1, 14) ~= 1 then return end
 
 		local pos_above = {x = pos.x, y = pos.y + 1, z = pos.z}
 
@@ -98,6 +99,19 @@ minetest.register_lbm({
 	end
 })
 
+local function get_drop(original, rarity)
+	return {
+		items = {
+			{
+				items = {original},
+			},
+			{
+				rarity = rarity,
+				items = {"throwable_snow:snowball"},
+			},
+		}
+	}
+end
 
 for _, leaftype in pairs(leaves) do
 	minetest.override_item("default:" .. leaftype, {
@@ -115,6 +129,7 @@ for _, grasstype in pairs(grasses) do
 	minetest.override_item("default:dirt_with_" .. grasstype, {
 		tiles = snowy_dirt_tiles,
 		sounds = snowy_dirt_sounds,
+		drop = get_drop("default:dirt", 3),
 	})
 
 	if minetest.registered_nodes["ctf_map:dirt_with_" .. grasstype] then
@@ -124,3 +139,7 @@ for _, grasstype in pairs(grasses) do
 		})
 	end
 end
+
+minetest.override_item("default:snowblock", {
+	drop = get_drop("default:snowblock", 2)
+})
