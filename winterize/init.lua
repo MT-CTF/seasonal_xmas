@@ -15,7 +15,7 @@ minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
 	buildable_to = true,
 	floodable = true,
 	paramtype = "light",
-	sunlight_propogates = true,
+	sunlight_propagates = true,
 	use_texture_alpha = "clip",
 	node_box = {
 		type = "fixed",
@@ -30,7 +30,7 @@ minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
 		},
 	},
 	drop = "",
-	groups = {dig_immediate = 3, slippery = 4},
+	groups = {dig_immediate = 3, slippery = 4, fall_damage_add_percent = -75},
 	sounds = default.node_sound_glass_defaults(),
 })
 
