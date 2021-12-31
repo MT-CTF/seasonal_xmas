@@ -8,6 +8,7 @@ local leaves = {"leaves", "aspen_leaves", "jungleleaves"}
 
 local snow_placement_blacklist = {"default:snow", ".*slab.*", ".*stair.*", ".*fence.*", ".*post.*", ".*door.*"}
 
+local ice_sounds = default.node_sound_glass_defaults()
 minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
 	drawtype = "nodebox",
 	description = "Ice",
@@ -30,9 +31,46 @@ minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
 		},
 	},
 	drop = "",
-	groups = {dig_immediate = 3, slippery = 4, fall_damage_add_percent = -75},
-	sounds = default.node_sound_glass_defaults(),
+	groups = {dig_immediate = 3, slippery = 4},
+	sounds = ice_sounds,
 })
+
+local ice_fall_damage = 2
+minetest.register_on_player_hpchange(function(player, hp_change, reason)
+	if reason.type ~= "fall" then
+		return hp_change
+	end
+	local pos = player:get_pos()
+	local collision_box = player:get_properties().collisionbox
+	-- Remove all ice nodes the collision box presumably collided with
+	-- Only works for collision boxes where the XZ plane is smaller than 1x1
+	for y = 0, -10, -1 do -- HACK arbitrarily look down up to 10 nodes, as clients tend to report fall damage early
+		local ground_reached, ground_is_only_ice = false, true
+		for x = 1, 4, 3 do
+			for z = 3, 6, 3 do
+				local node_pos = vector.offset(pos, collision_box[x], y, collision_box[z])
+				local node = minetest.get_node(node_pos)
+				if node.name == "winterize:ice" then
+					ground_reached = true
+					minetest.dig_node(node_pos)
+					minetest.sound_play(ice_sounds.dig, {pos = node_pos}, true)
+				elseif (minetest.registered_nodes[node.name] or {}).walkable ~= false then
+					ground_reached = true
+					ground_is_only_ice = false
+				end
+			end
+		end
+		if ground_reached then
+			if ground_is_only_ice and hp_change < -ice_fall_damage then
+				-- Infer speed from damage: "1 hp per node/s", 1.4 node/s base speed that goes without damage according to clientenvironment.cpp
+				-- Continue falling with the speed only reduced by the done ice fall damage
+				player:add_velocity(vector.new(0, ice_fall_damage - 1.4 + hp_change, 0))
+				return -ice_fall_damage
+			end
+			return hp_change
+		end
+	end
+end, true)
 
 -- local function snow_can_fall_freely(pos)
 -- 	local voxelmanip = VoxelManip()
@@ -119,10 +157,12 @@ for _, leaftype in pairs(leaves) do
 		special_tiles = {"winterize_dead_leaves.png"},
 	})
 
-	minetest.override_item("ctf_map:" .. leaftype, {
-		tiles = {"winterize_dead_leaves.png"},
-		special_tiles = {"winterize_dead_leaves.png"},
-	})
+	if minetest.registered_nodes["ctf_map:" .. leaftype] then
+		minetest.override_item("ctf_map:" .. leaftype, {
+			tiles = {"winterize_dead_leaves.png"},
+			special_tiles = {"winterize_dead_leaves.png"},
+		})
+	end
 end
 
 for _, grasstype in pairs(grasses) do
