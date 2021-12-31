@@ -157,10 +157,12 @@ for _, leaftype in pairs(leaves) do
 		special_tiles = {"winterize_dead_leaves.png"},
 	})
 
-	minetest.override_item("ctf_map:" .. leaftype, {
-		tiles = {"winterize_dead_leaves.png"},
-		special_tiles = {"winterize_dead_leaves.png"},
-	})
+	if minetest.registered_nodes["ctf_map:" .. leaftype] then
+		minetest.override_item("ctf_map:" .. leaftype, {
+			tiles = {"winterize_dead_leaves.png"},
+			special_tiles = {"winterize_dead_leaves.png"},
+		})
+	end
 end
 
 for _, grasstype in pairs(grasses) do
