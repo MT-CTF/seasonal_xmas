@@ -1,6 +1,8 @@
 unused_args = false
 
 globals = {
+	"snow", "winterize",
+
 	"minetest", "throwable_snow", "default", "ctf_teams", "hud_events",
 }
 

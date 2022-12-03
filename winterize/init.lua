@@ -1,12 +1,11 @@
 if os.date("%m") ~= "12" then return end
 
+winterize = {}
+
 local snowy_dirt_tiles = minetest.registered_nodes["default:dirt_with_snow"].tiles
 local snowy_dirt_sounds = minetest.registered_nodes["default:dirt_with_snow"].sounds
 local grasses = {"dry_grass", "grass", "coniferous_litter",}
 local leaves = {"leaves", "aspen_leaves", "jungleleaves"}
-
-
-local snow_placement_blacklist = {"default:snow", ".*slab.*", ".*stair.*", ".*fence.*", ".*post.*", ".*door.*"}
 
 minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
 	drawtype = "nodebox",
@@ -34,70 +33,166 @@ minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
 	sounds = default.node_sound_glass_defaults(),
 })
 
--- local function snow_can_fall_freely(pos)
--- 	local voxelmanip = VoxelManip()
--- 	local aircheck_pos = vector.new(pos.x, pos.y + 20, pos.z)
--- 	local vpos1, vpos2 = voxelmanip:read_from_map(pos, aircheck_pos)
--- 	local voxelarea = VoxelArea:new{MinEdge=vpos1, MaxEdge=vpos2}
--- 	local nodes_above = voxelmanip:get_data()
-
--- 	for ypos = pos.y, aircheck_pos.y, 1 do
--- 		local nodeid = nodes_above[voxelarea:indexp(vector.new(pos.x, ypos, pos.z))]
--- 		if nodeid ~= minetest.CONTENT_AIR and
--- 		minetest.registered_items[minetest.get_name_from_content_id(nodeid)].pointable then -- ignore barriers
--- 			return false -- Obstruction found
--- 		end
--- 	end
-
--- 	return true -- Snow can fall freely
--- end
-
--- local function snow_can_fall_freely(pos)
--- 	return not minetest.raycast(pos, vector.new(pos.x, pos.y+5, pos.z), false, true):next()
--- end
-
-local get_node = minetest.get_node
-local set_node = minetest.set_node
-minetest.register_lbm({
-	label = "Add ice layer to top of water",
-	name = "winterize:top_water_with_ice",
-	nodenames = {"default:water_source", "default:river_water_source"},
-	run_at_every_load = true,
-	action = function(pos, node)
-		local pos_above = vector.new(pos.x, pos.y + 1, pos.z)
-
-		if minetest.get_node(pos_above).name == "air" then
-			minetest.set_node(pos_above, {name = "winterize:ice"})
-		end
-	end
+minetest.register_node("winterize:present", {
+	description = "Present",
+	tiles = {
+		"winterize_present_top.png",  "winterize_present_bottom.png", "winterize_present_side.png",
+		"winterize_present_side.png", "winterize_present_side.png",   "winterize_present_front.png"
+	},
+	paramtype = "light",
+	light_source = 6,
+	groups = {dig_immediate = 2},
+	drop = {
+		items = {
+			{
+				items = {"throwable_snow:snowball 10"},
+			},
+		},
+	},
+	sounds = default.node_sound_wood_defaults(),
 })
 
-local match = string.match
-local registered_items = minetest.registered_items
-local random = math.random
-minetest.register_lbm({
-	label = "Place snow on top of nodes",
-	name = "winterize:top_nodes_with_snow",
-	nodenames = {"group:crumbly", "group:leaves", "group:choppy"},
-	run_at_every_load = true,
-	action = function(pos, node)
-		if node.name == "air" or random(1, 20) ~= 1 then return end
+function winterize.get_present_count()
+	return #minetest.get_connected_players()
+end
 
-		local pos_above = {x = pos.x, y = pos.y + 1, z = pos.z}
+-- Add snow and ice to map
+ctf_api.register_on_new_match(function()
+	minetest.after(1, function()
+		local vm = VoxelManip(ctf_map.current_map.pos1, ctf_map.current_map.pos2)
+		local o_pos1, o_pos2 = vm:get_emerged_area()
 
-		for _, searchfor in pairs(snow_placement_blacklist) do
-			if match(node.name, searchfor) then
-				return
+		minetest.log("action", "Starting to winterize...")
+		minetest.handle_async(function(data, pos1, pos2, present_count)
+			local outdata = {}
+			local present_positions = {}
+
+			local math_random = math.random
+			local math_min = math.min
+
+			local ID_AIR = minetest.CONTENT_AIR
+			local ID_IGNORE = minetest.get_content_id("ctf_map:ignore")
+			local ID_GLASS = minetest.get_content_id("ctf_map:ind_glass")
+			local ID_WATER = minetest.get_content_id("default:water_source")
+
+			local snow_place_blacklist = {
+				"ctf_map:", "default:snow", "doors:", "ctf_teams:", "default:fence",
+				"stairs:", "walls:", "default:mese_post", "xpanes:",
+			}
+			local SNOW_ID = minetest.get_content_id("default:snow")
+			local ICE_ID = minetest.get_content_id("winterize:ice")
+			local PRESENT_ID = minetest.get_content_id("winterize:present")
+
+			local Nx = pos2.x - pos1.x + 1
+			local Ny = pos2.y - pos1.y + 1
+			local count = 0
+
+			for y = pos1.y+1, pos2.y-1 do -- Make sure above/below checks don't go out of bounds
+				for z = pos1.z, pos2.z do
+					for x = pos1.x, pos2.x do
+						local pre = (((z - pos1.z) * Ny) * Nx)
+						local mid = (y - pos1.y) * Nx
+						local post = (x - pos1.x) + 1
+
+						local vi = pre + mid + post
+
+						local vi_below = pre + (mid - Nx) + post
+
+						if data[vi_below] ~= ID_AIR and data[vi] == ID_AIR then
+							if y <= pos2.y - 10 and data[vi_below] == ID_WATER then -- will ignore water near the ceiling
+								outdata[vi] = {i = ICE_ID, b = vi_below}
+								count = count + 1
+							elseif data[pre + (mid + Nx) + post] == ID_AIR then -- id_above == AIR
+								local name = minetest.get_name_from_content_id(data[vi_below])
+								local hit = false
+
+								if minetest.registered_nodes[name].walkable == false then
+									hit = true
+								else
+									for _, pattern in pairs(snow_place_blacklist) do
+										if name:find(pattern) then
+											hit = true
+											break
+										end
+									end
+								end
+
+								if not hit then
+									for i = 1, math_min((pos2.y - y) - 4, 80) do
+										local id = data[pre + (mid + (i * Nx)) + post]
+
+										if id ~= ID_AIR then
+											-- Only count a hit if we aren't near the top of the map
+											local ignore_check = data[pre + (mid + ((i+4) * Nx)) + post]
+
+											if ignore_check ~= ID_AIR and ignore_check ~= ID_IGNORE and ignore_check ~= ID_GLASS then
+												hit = true
+											end
+
+											break
+										end
+									end
+
+									if not hit then
+										if math_random(5) <= 4 then -- roughly 4/5 map coverage
+											outdata[vi] = {i = SNOW_ID, b = vi_below}
+											count = count + 1
+										elseif present_count > 0 then
+											table.insert(present_positions, {vi = vi, i = PRESENT_ID, b = vi_below})
+										end
+									end
+								end
+							end
+						end
+					end
+				end
 			end
-		end
 
-		if get_node(pos_above).name == "air" and registered_items[node.name].walkable then
-			-- if snow_can_fall_freely(pos_above) then
-				set_node(pos_above, {name = "default:snow"})
-			-- end
-		end
-	end
-})
+			if present_count > 0 and #present_positions > 0 then
+				table.shuffle(present_positions)
+
+				for i=1, math_min(present_count, #present_positions) do
+					local vi = present_positions[i].vi
+					present_positions[i].vi = nil
+					outdata[vi] = present_positions[i]
+					minetest.log(dump("hi"))
+				end
+			end
+
+			return outdata, count
+		end,
+		function(outdata, change_count)
+			if change_count <= 1000 then
+				snow.SPAWN_SNOW = false
+				minetest.log("action", "Done winterizing, skipped changes: "..change_count)
+				return
+			else
+				snow.SPAWN_SNOW = true
+				minetest.log("action", "Done winterizing. Changes: "..change_count)
+			end
+
+			minetest.after(1, function()
+				local newvm = VoxelManip(o_pos1, o_pos2)
+				local data = newvm:get_data()
+
+				local ID_AIR = minetest.CONTENT_AIR
+				local ID_IGNORE = minetest.CONTENT_IGNORE
+				for i in pairs(data) do
+					if outdata[i] then
+						if data[i] == ID_AIR and data[outdata[i].b] ~= ID_AIR then
+							data[i] = outdata[i].i
+						end
+					else
+						data[i] = ID_IGNORE
+					end
+				end
+
+				newvm:set_data(data)
+				newvm:write_to_map(false)
+			end)
+		end, vm:get_data(), o_pos1, o_pos2, winterize.get_present_count())
+	end)
+end)
 
 local function get_drop(original, rarity)
 	return {
@@ -137,6 +232,13 @@ for _, grasstype in pairs(grasses) do
 			tiles = snowy_dirt_tiles,
 			sounds = snowy_dirt_sounds,
 		})
+	end
+end
+
+-- Remove flower and grass nodes
+for name, def in pairs(minetest.registered_nodes) do
+	if name:find("default:grass") or name:find("flowers:") then
+		minetest.register_alias_force(name, "air")
 	end
 end
 

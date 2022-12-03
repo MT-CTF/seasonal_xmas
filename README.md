@@ -1,14 +1,12 @@
 # X-Mas on CTF!
 
-Deadline: 1st December
-
 All content must be freely licensed.
 
 ## Credits
 
 ### Code
 * `snow` MIT by LoneWolfHT, rubenwardy, Thomas-S, and GreenXenith
-* `winterize` MIT by LoneWolfHT
+* `winterize` and `santa_hat_event` MIT by LoneWolfHT
 
 ### Media
 
