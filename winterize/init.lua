@@ -5,7 +5,7 @@ winterize = {}
 local snowy_dirt_tiles = minetest.registered_nodes["default:dirt_with_snow"].tiles
 local snowy_dirt_sounds = minetest.registered_nodes["default:dirt_with_snow"].sounds
 local grasses = {"dry_grass", "grass", "coniferous_litter",}
-local leaves = {"leaves", "aspen_leaves", "jungleleaves"}
+local leaves = {"leaves", "aspen_leaves", "jungleleaves", "bush_leaves",}
 
 minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
 	drawtype = "nodebox",
@@ -29,7 +29,7 @@ minetest.register_node("winterize:ice", { -- breaks instantly, drops nothing
 		},
 	},
 	drop = "",
-	groups = {dig_immediate = 3, slippery = 4, fall_damage_add_percent = -75},
+	groups = {dig_immediate = 3, slippery = 4, fall_damage_add_percent = -40},
 	sounds = default.node_sound_glass_defaults(),
 })
 
@@ -58,7 +58,7 @@ end
 
 -- Add snow and ice to map
 ctf_api.register_on_new_match(function()
-	minetest.after(1, function()
+	minetest.after(2, function()
 		local vm = VoxelManip(ctf_map.current_map.pos1, ctf_map.current_map.pos2)
 		local o_pos1, o_pos2 = vm:get_emerged_area()
 
@@ -155,7 +155,6 @@ ctf_api.register_on_new_match(function()
 					local vi = present_positions[i].vi
 					present_positions[i].vi = nil
 					outdata[vi] = present_positions[i]
-					minetest.log(dump("hi"))
 				end
 			end
 
@@ -171,7 +170,7 @@ ctf_api.register_on_new_match(function()
 				minetest.log("action", "Done winterizing. Changes: "..change_count)
 			end
 
-			minetest.after(1, function()
+			minetest.after(2, function()
 				local newvm = VoxelManip(o_pos1, o_pos2)
 				local data = newvm:get_data()
 
