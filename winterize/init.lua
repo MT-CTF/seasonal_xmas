@@ -53,7 +53,7 @@ minetest.register_node("winterize:present", {
 })
 
 function winterize.get_present_count()
-	return #minetest.get_connected_players()
+	return 0
 end
 
 -- Add snow and ice to map
