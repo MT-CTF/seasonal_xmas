@@ -20,6 +20,15 @@ skybox.clear = function(player)
 		thickness = 20,
 		speed = {x = -3, z = -3},
 	})
+
+	player:set_sky({
+		sky_color = {
+			day_sky = "#529cd5",
+			day_horizon = "#69aed3",
+			dawn_sky = "#b19be6",
+			dawn_horizon = "#a99bde",
+		}
+	})
 end
 
 -- Spawns snow particles around player
