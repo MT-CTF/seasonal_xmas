@@ -70,7 +70,7 @@ minetest.override_item("winterize:present", {
 })
 
 minetest.register_craftitem("santa_hat_event:cookie", {
-	description = "A Cookie (Rightclick to eat)",
+	description = "A Cookie (Leftclick to eat)",
 	inventory_image = "santa_hat_event_cookie.png",
 	on_use = EAT_FUNC(1),
 })
