@@ -7,7 +7,6 @@ local COOKIES_PER_PRESENT = 2
 
 local function EAT_FUNC(amount)
 	return function(itemstack, user)
-		minetest.log("hizzz")
 		if not itemstack or not user or not user:is_player() then return itemstack end
 
 		local meta = user:get_meta()
