@@ -2,13 +2,13 @@ unused_args = false
 
 globals = {
 	"snow", "winterize",
-
-	"minetest", "throwable_snow", "default", "ctf_teams", "hud_events",
+	"minetest", "throwable_snow", "default",
+	"ctf_teams", "hud_events", "skybox"
 }
 
 read_globals = {
 	string = {fields = {"split", "trim"}},
-	table = {fields = {"copy", "getn"}},
+	table = {fields = {"copy", "getn", "shuffle"}},
 
 	"dump", "DIR_DELIM",
 	"sfinv", "creative",
@@ -21,7 +21,8 @@ read_globals = {
 	"VoxelArea",
 	"VoxelManip",
 	"PseudoRandom",
-
+	"ctf_map",
+	"ctf_api",
 
 	-- Testing
 	"describe",
