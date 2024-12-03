@@ -1,4 +1,4 @@
-if os.date("%m") ~= "12" or tonumber(os.date("%d")) < 11 or tonumber(os.date("%d")) > 2
+if os.date("%m") ~= "12" or tonumber(os.date("%d")) < 11 or tonumber(os.date("%d")) > 25
 	or not minetest.get_modpath("server_cosmetics") then return end
 
 local META_KEY = "server_cosmetics:snowballs:"..os.date("%Y")
