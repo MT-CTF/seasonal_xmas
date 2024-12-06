@@ -1,12 +1,10 @@
 if os.date("%m") ~= "12" then return end
 
--- Particlespawner attachment is currently broken, so the following code positions a
--- particle spawner which lasts for 1.4s every 0.7s for each player. The spawners are
--- bound to individual players
-
 snow = {
 	SPAWN_SNOW = false,
 }
+
+local spawners = {}
 
 -- Set clouds for normal skybox
 local old_clear = skybox.clear
@@ -33,39 +31,87 @@ end
 
 -- Spawns snow particles around player
 local function spawn_particles(player)
-	minetest.add_particlespawner({
-		amount = 6 * 60,
-		minpos = vector.new(-25, 10, -25),
-		maxpos = vector.new( 25, 25,  25),
-		minvel = vector.new(-2, -7, -2),
-		maxvel = vector.new(-2, -9, -2),
-		time = math.random(60, 90),
-		minexptime = 10,
-		maxexptime = 10,
-		minsize = 1,
-		maxsize = 3,
-		collisiondetection = true,
-		collision_removal = true,
-		object_collision = true,
-		vertical = false,
-		texture = ("[combine:7x7:%s,%s=snow_snowflakes.png"):format(math.random(0, 3) * -7, math.random(0, 1) * -7),
-		playername = player:get_player_name(),
-		attached = player,
-		glow = 2
-	})
+	local name = player:get_player_name()
+	local amount = 6 * 60
+
+	if ctf_settings then
+		amount = amount * tonumber(ctf_settings.settings["snow:particle_amount"]._list_map[
+			tonumber(ctf_settings.get(player, "snow:particle_amount"))
+		])
+	end
+
+	if amount > 0 then
+		local time = math.random(60, 90)
+
+		spawners[name] = {
+			id = minetest.add_particlespawner({
+				amount = amount,
+				minpos = vector.new(-25, 10, -25),
+				maxpos = vector.new( 25, 25,  25),
+				minvel = vector.new(-2, -7, -2),
+				maxvel = vector.new(-2, -9, -2),
+				time = time,
+				minexptime = 10,
+				maxexptime = 10,
+				minsize = 1,
+				maxsize = 3,
+				collisiondetection = true,
+				collision_removal = true,
+				object_collision = true,
+				vertical = false,
+				texture = ("[combine:7x7:%s,%s=snow_snowflakes.png"):format(math.random(0, 3) * -7, math.random(0, 1) * -7),
+				playername = name,
+				attached = player,
+				glow = 2
+			}),
+			timer = minetest.after(time-1, function()
+				spawners[name] = nil
+			end)
+		}
+	else
+		spawners[name] = nil
+	end
 end
 
 local spawner_step = 50
 minetest.register_globalstep(function(dtime)
-	if spawner_step >= 60 then
-		if snow.SPAWN_SNOW then
-			spawner_step = 0
+	if not snow.SPAWN_SNOW then return end
 
-			for _, player in pairs(minetest.get_connected_players()) do
-				spawn_particles(player)
-			end
+	if spawner_step >= 60 then
+		spawner_step = 0
+
+		for _, player in pairs(minetest.get_connected_players()) do
+			spawn_particles(player)
 		end
 	else
 		spawner_step = spawner_step + dtime
 	end
 end)
+
+if ctf_settings then
+	ctf_settings.register("snow:particle_amount", {
+		type = "list",
+		description = "How much falling snow to spawn around you",
+		list = {
+			"Snow Particles - Default",
+			"Snow Particles - None",
+			"Snow Particles - 0.5x",
+			"Snow Particles - 2x",
+			"Snow Particles - 5x",
+			"Snow Particles - 10x",
+			"Snow Particles - 20x",
+		},
+		_list_map = {1, 0, 0.5, 2, 5, 10, 20},
+		default = "1", -- "Snow Particles - Default"
+		on_change = function(player, new_value)
+			local name = player:get_player_name()
+
+			if spawners[name] then
+				minetest.delete_particlespawner(spawners[name].id)
+				spawners[name].timer:cancel()
+			end
+
+			spawn_particles(player)
+		end
+	})
+end
