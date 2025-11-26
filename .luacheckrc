@@ -5,6 +5,7 @@ globals = {
 	"minetest", "throwable_snow", "default",
 	"ctf_teams", "hud_events", "skybox",
 	"ctf_settings",
+	"ctf_modebase",
 }
 
 read_globals = {
